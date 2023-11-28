@@ -8,6 +8,7 @@
 	let searchTown;
 	let changeVoorziening;
 	let currentValue;
+	let maxValue;
 
 	// console.log(filteredNeighbourhoods)
 
@@ -57,44 +58,49 @@
 			}
 
 			console.log(searchValue);
-
 		};
 
 		const listTowns = (townNames) => {
-
-			d3.select('ul')
-				.selectAll('li')
+			d3.select('datalist')
+				.selectAll('option')
 				.data(townNames)
-				.join('li')
+				.join('option')
 				.text((d) => d)
-				.style('list-style', 'none')
-				// .on('click', d => console.log(d))
+				.style('list-style', 'none');
+			// .on('click', d => console.log(d))
 		};
 
 		listTowns(arrTownNames);
-
-		d3.select('#voorzieningen')
-			.selectAll('option')
-			.data(objKeysAfstand)
-			.join('option')
-			.attr('value', (d) => d)
-			.text((d) => d);
 
 
 		changeVoorziening = (e) => {
 			currentValue = e.target.value;
 			console.log(currentValue);
-			// roep het weer aan
-			// createVisualisation(currentValue);
 			updateAll(currentValue);
 		};
 
 		// on page load
 		console.log(currentValue);
 
-		const calculateGrid = (currentValue) => {
+		const filterVoorziening = (currentValue) => {
 			let allValues = filteredNeighbourhoods.map((item) => item[currentValue]);
-			const maxValue = d3.max(allValues);
+			return allValues;
+		};
+
+		const maxValueGrid = (number) => {
+			if (!Array.isArray(number)) {
+				const arr = [];
+				// number = Array.from(String(number), Number);
+				arr.push(number);
+				number = arr;
+			}
+			maxValue = d3.max(number);
+			return maxValue;
+		};
+
+		// parameter weg?
+		const calculateGrid = (maxValue) => {
+			// const maxValue = d3.max(allValues);
 			// maxValue should be the on click radius value.
 			// scale moet ook veranderen
 			// label moet veranderen
@@ -106,9 +112,6 @@
 				{ radius: 300, circleValues: math * 3 },
 				{ radius: 200, circleValues: math * 2 },
 				{ radius: 100, circleValues: math }
-				
-				
-				
 			];
 
 			// 	return [
@@ -119,17 +122,10 @@
 			// ];
 		};
 
-		// const scalesqrt = d3.scaleSqrt()
-		// .domain([0, 2.1])
-		// .range([0, Math.PI * 1600])
-
-		// scalesqrt()
-		// console.log(scalesqrt(2.1))
-
 		// console.log(calculateGrid('AfstandTotBibliotheek_107'))
 
 		const createScale = (distance) => {
-			const maxValue = calculateGrid(currentValue)[0]['circleValues'];
+			// const maxValue = calculateGrid(currentValue)[0]['circleValues'];
 			// console.log(maxValue)
 			const scale = d3.scaleLinear().domain([0, maxValue]).range([0, radius]).clamp(true);
 			return scale(distance);
@@ -151,35 +147,38 @@
 		d3.select('#bubbles')
 			.select('#bubbles #grids')
 			.selectAll('g')
-			.data(calculateGrid(currentValue))
+			.data(calculateGrid(maxValue))
 			.join('g')
 			.attr('id', 'groupedGrid');
 
 		d3.selectAll('#groupedGrid').append('text');
 
 		// create radius of each grid circle
-		d3.selectAll('#groupedGrid')
-			.data(calculateGrid(currentValue))
-			.append('circle')
-			.attr('stroke', 'black')
-			.attr('r', (d) => d.radius)
-			.attr('fill', 'transparent')
-			.on('click', (e, d) => {
-				// e.stopPropagation() 
-				// maxValue = d.circleValues
-				return console.log(d.circleValues)
-			})
-
+		const radiusGrid = () => {
 			d3.selectAll('#groupedGrid')
-			.selectAll('circle')
-			.attr('value', d => console.log(d))
-			.on('hover', (e, d) => console.log(d))
+				.data(calculateGrid(maxValue))
+				.append('circle')
+				.attr('stroke', 'black')
+				.attr('r', (d) => d.radius)
+				.attr('fill', 'transparent')
+				.on('click', (e, d) => {
+					// maxValue = d.circleValues
+					maxValue = maxValueGrid(d.circleValues);
+					console.log(maxValue);
+					createLabelsGrid(currentValue);
+					// createScale(1);
+					createVisualisation(currentValue);
+					console.log(currentValue);
+					// updateAll(currentValue);
+					return console.log(d.circleValues);
+				});
+		};
 
 		// add labels for the grids
 
 		const createLabelsGrid = (currentValue) => {
 			d3.selectAll('#groupedGrid text')
-				.data(calculateGrid(currentValue))
+				.data(calculateGrid(maxValue))
 				.text((d) => d.circleValues + ' km')
 				.attr('x', -9)
 				// .attr('y', grid.map(item => item.radius))
@@ -191,6 +190,7 @@
 
 		// create bubbles for all the data
 		const createVisualisation = (currentValue) => {
+			console.log(currentValue);
 			dataBubbles = d3
 				.select('#viz')
 				.select('#viz #bubbles #allDataBubbles')
@@ -230,7 +230,9 @@
 		// createVisualisation(currentValue)
 
 		const updateAll = (currentValue) => {
-			calculateGrid(currentValue);
+			maxValueGrid(filterVoorziening(currentValue));
+			calculateGrid(maxValue);
+			radiusGrid();
 			createScale(1);
 			createLabelsGrid(currentValue);
 			createVisualisation(currentValue);
@@ -238,15 +240,17 @@
 
 		updateAll(currentValue);
 	});
-	
 </script>
 
 <section>
 	<form action="">
 		<label for="search">Search</label>
 		<div>
-			<input id="search" type="text" placeholder="Gemeente..." on:input={searchTown} />
-			<ul />
+			<input list="towns" id="search" type="text" placeholder="Gemeente..." on:input={searchTown} />
+			<!-- <ul /> -->
+			<datalist id="towns">
+				
+			</datalist>
 		</div>
 	</form>
 
@@ -259,8 +263,23 @@
 			bind:value={currentValue}
 			on:input={changeVoorziening}
 		>
-			<option value="AfstandTotHuisartsenpraktijk_5">AfstandTotHuisartsenpraktijk_5</option>
+			<!-- <option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option> -->
+			<!-- <option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option> -->
 			<!-- <option value="ziekenhuis">ziekenhuis</option> -->
+
+			<option value="AfstandTotHuisartsenpraktijk_5">AfstandTotHuisartsenpraktijk</option><option
+				value="AfstandTotZiekenhuis_11">AfstandTotZiekenhuis</option
+			><option value="AfstandTotGroteSupermarkt_24">AfstandTotGroteSupermarkt</option><option
+				value="AfstandTotCafeED_36">AfstandTotCafeED</option
+			><option value="AfstandTotRestaurant_44">AfstandTotRestaurant</option><option
+				value="AfstandTotHotelED_48">AfstandTotHotelED</option
+			><option value="AfstandTotKinderdagverblijf_52">AfstandTotKinderdagverblijf</option><option
+				value="AfstandTotBuitenschoolseOpvang_56">AfstandTotBuitenschoolseOpvang</option
+			><option value="AfstandTotSchool_60">AfstandTotSchool</option><option
+				value="AfstandTotSchool_64">AfstandTotSchool</option
+			><option value="AfstandTotBibliotheek_107">AfstandTotBibliotheek</option><option
+				value="AfstandTotMuseum_110">AfstandTotMuseum</option
+			><option value="AfstandTotBioscoop_119">AfstandTotBioscoop</option>
 		</select>
 	</form>
 
@@ -291,7 +310,7 @@
 		border: solid red;
 		display: block;
 	} */
-	
+
 	input[type='text']:focus ~ ul {
 		display: block;
 	}
