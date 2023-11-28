@@ -10,6 +10,9 @@
 	let currentValue;
 	let maxValue;
 
+	const grey = '#8995A4';
+	const blue = '#00BCC6'
+
 	// console.log(filteredNeighbourhoods)
 
 	onMount(async () => {
@@ -158,7 +161,7 @@
 			d3.selectAll('#groupedGrid')
 				.data(calculateGrid(maxValue))
 				.append('circle')
-				.attr('stroke', 'black')
+				.attr('stroke', grey)
 				.attr('r', (d) => d.radius)
 				.attr('fill', 'transparent')
 				.on('click', (e, d) => {
@@ -183,7 +186,8 @@
 				.attr('x', -9)
 				// .attr('y', grid.map(item => item.radius))
 				.attr('y', (d) => -d.radius - 5)
-				.attr('font-size', '1.1em');
+				.attr('font-size', '1.1em')
+				.attr('fill', grey)
 		};
 
 		let dataBubbles;
@@ -197,8 +201,7 @@
 				.data(filteredNeighbourhoods.map((item) => item))
 				.join('circle')
 				.attr('r', 5)
-				.attr('fill', 'transparent')
-				.attr('stroke', 'black')
+				.attr('fill', blue)
 				.on('mouseover', (e, d) => {
 					d3.select('#tooltip')
 						.style('opacity', 1)
