@@ -108,10 +108,10 @@
 			const math = maxValue / 4;
 
 			return [
-				{ radius: radius, circleValues: math * 4 },
-				{ radius: 300, circleValues: math * 3 },
-				{ radius: 200, circleValues: math * 2 },
-				{ radius: 100, circleValues: math }
+				{ radius: radius, circleValues: Math.round((math * 4) * 10) / 10 },
+				{ radius: 300, circleValues: Math.round((math * 3) * 10) / 10 },
+				{ radius: 200, circleValues: Math.round((math * 2) * 10) / 10 },
+				{ radius: 100, circleValues: Math.round(math * 10) / 10 }
 			];
 
 			// 	return [
@@ -190,7 +190,6 @@
 
 		// create bubbles for all the data
 		const createVisualisation = (currentValue) => {
-			console.log(currentValue);
 			dataBubbles = d3
 				.select('#viz')
 				.select('#viz #bubbles #allDataBubbles')
@@ -198,15 +197,6 @@
 				.data(filteredNeighbourhoods.map((item) => item))
 				.join('circle')
 				.attr('r', 5)
-				.attr('cx', function (d, i) {
-					// how many angles it needs to have based on the amount of data(i)
-					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
-					return createScale(d[currentValue]) * Math.cos(alpha - Math.PI / 2); // trigonometry
-				})
-				.attr('cy', function (d, i) {
-					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
-					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
-				})
 				.attr('fill', 'transparent')
 				.attr('stroke', 'black')
 				.on('mouseover', (e, d) => {
@@ -223,7 +213,20 @@
 						.style('opacity', 1);
 				})
 				.on('mouseout', (e, d) => {
-					d3.select('#tooltip').style('opacity', 0);
+					d3.select('#tooltip')
+					.style('opacity', 0)
+					.style('left', 100 + 'px')
+				})
+				.transition()
+				.duration(800)
+				.attr('cx', function (d, i) {
+					// how many angles it needs to have based on the amount of data(i)
+					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
+					return createScale(d[currentValue]) * Math.cos(alpha - Math.PI / 2); // trigonometry
+				})
+				.attr('cy', function (d, i) {
+					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
+					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
 				});
 		};
 
@@ -295,17 +298,6 @@
 </section>
 
 <style>
-	ul {
-		height: 4rem;
-		width: fit-content;
-		overflow: scroll;
-		display: none;
-	}
-
-	li {
-		list-style: none;
-	}
-
 	/* section form:nth-child(1):focus ul {
 		border: solid red;
 		display: block;
