@@ -11,7 +11,8 @@
 	let maxValue;
 
 	const grey = '#8995A4';
-	const blue = '#00BCC6'
+	const blue = '#00BCC6';
+	const white = '#000000';
 
 	// console.log(filteredNeighbourhoods)
 
@@ -44,19 +45,26 @@
 		let arrTownNames = filteredNeighbourhoods.map((item) => item['Gemeentenaam_1']);
 		let searchValue;
 
+		const highlightTown = () => {
+			dataBubbles.attr('fill', (d) =>
+					d['Gemeentenaam_1'].includes(searchValue) ? 'red' : '#00BCC6'
+					
+				);
+		}
+
 		searchTown = (e) => {
 			if (e.target.value) {
+				// highlightTown()
 				searchValue = e.target.value[0].toUpperCase() + e.target.value.slice(1);
 				let arrFilteredTownNames = arrTownNames.filter((item) => item.includes(searchValue));
 				listTowns(arrFilteredTownNames);
 
-				dataBubbles.attr('stroke-width', (d) =>
-					d['Gemeentenaam_1'].includes(searchValue) ? 5 : 1
-				);
+				highlightTown();
+				
 			} else {
 				listTowns(arrTownNames);
 
-				dataBubbles.attr('stroke-width', 1);
+				dataBubbles.attr('fill', '#00BCC6');
 				console.log(searchValue);
 			}
 
@@ -171,6 +179,7 @@
 					createLabelsGrid(currentValue);
 					// createScale(1);
 					createVisualisation(currentValue);
+					highlightTown()
 					console.log(currentValue);
 					// updateAll(currentValue);
 					return console.log(d.circleValues);
@@ -202,6 +211,15 @@
 				.join('circle')
 				.attr('r', 5)
 				.attr('fill', blue)
+				.attr('cx', function (d, i) {
+					// how many angles it needs to have based on the amount of data(i)
+					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
+					return createScale(d[currentValue]) * Math.cos(alpha - Math.PI / 2); // trigonometry
+				})
+				.attr('cy', function (d, i) {
+					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
+					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
+				})
 				.on('mouseover', (e, d) => {
 					d3.select('#tooltip')
 						.style('opacity', 1)
@@ -220,17 +238,9 @@
 					.style('opacity', 0)
 					.style('left', 100 + 'px')
 				})
-				.transition()
-				.duration(800)
-				.attr('cx', function (d, i) {
-					// how many angles it needs to have based on the amount of data(i)
-					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
-					return createScale(d[currentValue]) * Math.cos(alpha - Math.PI / 2); // trigonometry
-				})
-				.attr('cy', function (d, i) {
-					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
-					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
-				});
+				// .transition()
+				// .duration(800)
+				
 		};
 
 		// createVisualisation(currentValue)
@@ -242,6 +252,9 @@
 			createScale(1);
 			createLabelsGrid(currentValue);
 			createVisualisation(currentValue);
+			highlightTown();
+
+			// console.log(searchValue)
 		};
 
 		updateAll(currentValue);
@@ -250,9 +263,9 @@
 
 <section>
 	<form action="">
-		<label for="search">Search</label>
+		<label for="search">Zoeken</label>
 		<div>
-			<input list="towns" id="search" type="text" placeholder="Gemeente..." on:input={searchTown} />
+			<input list="towns" id="search" type="text" placeholder="Bijv. Amsterdam" on:input={searchTown} />
 			<!-- <ul /> -->
 			<datalist id="towns">
 				
@@ -260,8 +273,10 @@
 		</div>
 	</form>
 
+	<!-- <p>hallo hoe gaat het</p> -->
+
 	<form action="">
-		<label for="search">Voorziening</label>
+		<label for="voorzieningen">Voorziening</label>
 		<!-- <input type="dropdown" placeholder="Gemeente..."> -->
 		<select
 			name="voorzieningen"
@@ -302,18 +317,63 @@
 
 <style>
 	/* section form:nth-child(1):focus ul {
-		border: solid red;
-		display: block;
+		style="
+--blue= '#00BCC6';
+--white= '#000000';
+--grey= '#8995A4';"
+h1 = 
+h2 = 
+p = 
 	} */
 
-	input[type='text']:focus ~ ul {
-		display: block;
+	p, label {
+		color: white;
+		font-size: 1.125rem; /* 18px */
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	}
 
-	svg {
-		border: solid black;
-		/* margin-top: 10rem; */
+	label {
+		color: white;
+		margin-bottom: 0.5rem;
 	}
+
+	form {
+		display: flex;
+		flex-direction: column;
+		margin: 2rem;
+	}
+
+	input, select {
+		border: #00BCC6 solid;
+		caret-color: #00BCC6;
+		/* border-radius: 1rem; */
+		height: 3rem;
+		width: 19rem;
+		background-color: transparent;
+		padding-left: 1.5rem;
+		outline: none;
+		/* color: #00BCC6; */
+	}
+
+	input, input::placeholder, select {
+		color: #00BCC6;
+		font-size: 1.125rem;
+	}
+
+	select, input {
+		
+	}
+
+	input::placeholder {
+		/* opacity: 0.5; */
+		color: #8995A4;
+	}
+
+
+
+	/* svg {
+		border: solid black;
+	} */
 
 	#tooltip {
 		position: absolute;
