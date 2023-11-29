@@ -232,7 +232,7 @@
 				.selectAll('circle')
 				.data(filteredNeighbourhoods.map((item) => item))
 				.join('circle')
-				.attr('r', 5.5)
+				.attr('r', 4)
 				.attr('fill', blue)
 				.on('mouseover', (e, d) => {
 					d3.select('#tooltip')
@@ -372,7 +372,7 @@ p =
 
 	p, label, h3 {
 		color: white;
-		font-size: 1.125rem; /* 18px */
+		font-size: 1rem; /* 18px */
 		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	}
 
@@ -401,7 +401,7 @@ p =
 
 	input, input::placeholder, select {
 		color: #00BCC6;
-		font-size: 1.125rem;
+		font-size: 1rem;
 	}
 
 	select, input {
@@ -436,7 +436,7 @@ p =
 
 	h3 {
 		margin: 0;
-		font-size: 1.7rem;
+		font-size: 1.125rem;
 	}
 </style>
 
@@ -444,3 +444,9 @@ p =
 <!-- p = 18px = 1.125rem -->
 <!-- h1 = 40px = 2.5rem -->
 <!-- h2 = 32px = 2rem -->
+<!-- h3 = 27.2px = 1.7 -->
+
+<!-- p = 16px = 1rem -->
+<!-- h1 = 40px = 2.5rem -->
+<!-- h2 = 32px = 2rem -->
+<!-- h3 = 27.2px = 1.7 -->
