@@ -19,17 +19,17 @@
 
 <style>
     main {
-        width: 100vw;
-        height: 100vh;
-        overflow: auto;
+        width: 100%;
+        height: 100%;
+        overflow-x: scroll;
         display: flex;
         scroll-snap-type: x mandatory;
         scroll-behavior: smooth;
 
     }
     section {
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         flex-shrink: 0;
         scroll-snap-align: start;
         

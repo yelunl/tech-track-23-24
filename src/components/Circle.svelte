@@ -320,9 +320,6 @@
 			bind:value={currentValue}
 			on:input={changeVoorziening}
 		>
-			<!-- <option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option> -->
-			<!-- <option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option> -->
-			<!-- <option value="ziekenhuis">ziekenhuis</option> -->
 
 			<option value="AfstandTotHuisartsenpraktijk_5">AfstandTotHuisartsenpraktijk</option><option
 				value="AfstandTotZiekenhuis_11">AfstandTotZiekenhuis</option
@@ -332,8 +329,8 @@
 				value="AfstandTotHotelED_48">AfstandTotHotelED</option
 			><option value="AfstandTotKinderdagverblijf_52">AfstandTotKinderdagverblijf</option><option
 				value="AfstandTotBuitenschoolseOpvang_56">AfstandTotBuitenschoolseOpvang</option
-			><option value="AfstandTotSchool_60">AfstandTotSchool</option><option
-				value="AfstandTotSchool_64">AfstandTotSchool</option
+			><option value="AfstandTotSchool_60">AfstandTotBasisonderwijs</option><option
+				value="AfstandTotSchool_64">AfstandTotVoortgezetOnderwijs</option
 			><option value="AfstandTotBibliotheek_107">AfstandTotBibliotheek</option><option
 				value="AfstandTotMuseum_110">AfstandTotMuseum</option
 			><option value="AfstandTotBioscoop_119">AfstandTotBioscoop</option>
@@ -341,7 +338,7 @@
 	</form>
 </div>
 
-	<svg id="viz" width="1150" height="950">
+	<svg id="viz" width="1150" height="750">
 		<g id="bubbles">
 			<g id="grids" />
 			<g id="allDataBubbles" />
