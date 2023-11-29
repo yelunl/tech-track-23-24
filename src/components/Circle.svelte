@@ -63,12 +63,10 @@
 				
 			} else {
 				listTowns(arrTownNames);
-
+				searchValue = undefined;
 				dataBubbles.attr('fill', '#00BCC6');
-				console.log(searchValue);
 			}
 
-			console.log(searchValue);
 		};
 
 		const listTowns = (townNames) => {
@@ -109,7 +107,7 @@
 			return maxValue;
 		};
 
-		// parameter weg?
+		// parameter weg? nee
 		const calculateGrid = (maxValue) => {
 			// const maxValue = d3.max(allValues);
 			// maxValue should be the on click radius value.
@@ -183,7 +181,16 @@
 					console.log(currentValue);
 					// updateAll(currentValue);
 					return console.log(d.circleValues);
-				});
+				})
+				.on('mouseover', (e, d) => {
+					d3.select(e.target)
+					.attr('stroke', '#00BCC6')
+					.attr('stroke-width', 2)
+				})
+				.on('mouseout', (e, d) => {
+					d3.select(e.target)
+					.attr('stroke', '#8995A4')
+				})
 		};
 
 		// add labels for the grids
@@ -197,9 +204,25 @@
 				.attr('y', (d) => -d.radius - 5)
 				.attr('font-size', '1.1em')
 				.attr('fill', grey)
+				// .on('mouseover', (e, d) => {
+				// 	console.log(e.target)
+				// 	d3.select(e.target)
+				// 	.attr('fill', '#00BCC6')
+				// 	// .attr('stroke-width', 2)
+				// })
+				// .on('mouseout', (e, d) => {
+				// 	d3.select(e.target)
+				// 	.attr('fill', '#8995A4')
+				// })
 		};
 
 		let dataBubbles;
+
+// 		function getTransition() {
+//     return d3.transition()
+//       .duration(1000)
+      
+// }
 
 		// create bubbles for all the data
 		const createVisualisation = (currentValue) => {
@@ -209,23 +232,21 @@
 				.selectAll('circle')
 				.data(filteredNeighbourhoods.map((item) => item))
 				.join('circle')
-				.attr('r', 5)
+				.attr('r', 5.5)
 				.attr('fill', blue)
-				.attr('cx', function (d, i) {
-					// how many angles it needs to have based on the amount of data(i)
-					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
-					return createScale(d[currentValue]) * Math.cos(alpha - Math.PI / 2); // trigonometry
-				})
-				.attr('cy', function (d, i) {
-					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
-					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
-				})
 				.on('mouseover', (e, d) => {
 					d3.select('#tooltip')
 						.style('opacity', 1)
+						.select('h3')
 						.text(
-							`gemeente: ${d['Gemeentenaam_1']} afstand: ${d[currentValue]} voorziening: ${currentValue}`
-						);
+							`${d['Gemeentenaam_1']}`
+						)
+
+						d3.select('#tooltip p')
+						.text(
+							`Afstand: ${d[currentValue]} km`
+						)
+
 				})
 				.on('mousemove', (e, d) => {
 					d3.select('#tooltip')
@@ -236,10 +257,24 @@
 				.on('mouseout', (e, d) => {
 					d3.select('#tooltip')
 					.style('opacity', 0)
-					.style('left', 100 + 'px')
+					.style('left', 50 + 'px')
 				})
-				// .transition()
-				// .duration(800)
+				
+				// can only use transition once
+				d3
+				.select('#viz')
+				.select('#viz #bubbles #allDataBubbles')
+				.selectAll('circle')
+				.transition()
+				.attr('cx', function (d, i) {
+					// how many angles it needs to have based on the amount of data(i)
+					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
+					return createScale(d[currentValue]) * Math.cos(alpha - Math.PI / 2); // trigonometry
+				})
+				.attr('cy', function (d, i) {
+					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
+					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
+				})
 				
 		};
 
@@ -251,7 +286,7 @@
 			radiusGrid();
 			createScale(1);
 			createLabelsGrid(currentValue);
-			createVisualisation(currentValue);
+			createVisualisation(currentValue)
 			highlightTown();
 
 			// console.log(searchValue)
@@ -262,6 +297,7 @@
 </script>
 
 <section>
+	<div>
 	<form action="">
 		<label for="search">Zoeken</label>
 		<div>
@@ -303,7 +339,7 @@
 			><option value="AfstandTotBioscoop_119">AfstandTotBioscoop</option>
 		</select>
 	</form>
-
+</div>
 	<!-- <FilterSearch></FilterSearch> -->
 
 	<svg id="viz" width="1150" height="950">
@@ -312,7 +348,10 @@
 			<g id="allDataBubbles" />
 		</g>
 	</svg>
-	<div id="tooltip" />
+	<div id="tooltip" >
+		<h3></h3>
+		<p></p>
+	</div>
 </section>
 
 <style>
@@ -326,7 +365,13 @@ h2 =
 p = 
 	} */
 
-	p, label {
+	section {
+		display: flex;
+		justify-content: space-between;
+
+	}
+
+	p, label, h3 {
 		color: white;
 		font-size: 1.125rem; /* 18px */
 		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -377,9 +422,26 @@ p =
 
 	#tooltip {
 		position: absolute;
-		border: solid green;
-		width: 9rem;
-		height: 5rem;
-		/* opacity: 0; */
+		padding: 0.5rem;
+		border: solid #00BCC6;
+		background: hsla(226, 22%, 16%, 0.7);
+		width: 15.7rem;
+		height: 10.3rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		border-radius: 1.25rem;
+		opacity: 0;
+	}
+
+	h3 {
+		margin: 0;
+		font-size: 1.7rem;
 	}
 </style>
+
+
+<!-- p = 18px = 1.125rem -->
+<!-- h1 = 40px = 2.5rem -->
+<!-- h2 = 32px = 2rem -->

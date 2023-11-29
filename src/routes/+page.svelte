@@ -1,14 +1,14 @@
 <!-- <script src="d3.js"></script> -->
 <script>
 	import Circle from "../components/Circle.svelte";
+    import Intro from "../components/Intro.svelte";
     
 </script>
 
 <main>
 
 <section id="page1">
-    <h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+    <Intro></Intro>
 </section>
 
 <section id="page2">
@@ -28,7 +28,6 @@
 
     }
     section {
-        border: solid red;
         width: 100vw;
         height: 100vh;
         flex-shrink: 0;
@@ -36,7 +35,11 @@
         
     }
 
-    #page1 {
-        width: 100vw;
+    section:nth-of-type(1) {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+
+    
 </style>
