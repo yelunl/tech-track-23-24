@@ -38,7 +38,7 @@
 			objKeysAfstand.forEach((item2) => (item[item2] = Number(item[item2])));
 		});
 
-		const radius = 400;
+		const radius = 300;
 		const marginLeft = 10;
 		const marginTop = 50;
 
@@ -118,9 +118,9 @@
 
 			return [
 				{ radius: radius, circleValues: Math.round((math * 4) * 10) / 10 },
-				{ radius: 300, circleValues: Math.round((math * 3) * 10) / 10 },
-				{ radius: 200, circleValues: Math.round((math * 2) * 10) / 10 },
-				{ radius: 100, circleValues: Math.round(math * 10) / 10 }
+				{ radius: 225, circleValues: Math.round((math * 3) * 10) / 10 },
+				{ radius: 150, circleValues: Math.round((math * 2) * 10) / 10 },
+				{ radius: 75, circleValues: Math.round(math * 10) / 10 }
 			];
 
 			// 	return [
@@ -340,7 +340,6 @@
 		</select>
 	</form>
 </div>
-	<!-- <FilterSearch></FilterSearch> -->
 
 	<svg id="viz" width="1150" height="950">
 		<g id="bubbles">
