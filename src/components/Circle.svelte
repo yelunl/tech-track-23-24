@@ -2,8 +2,6 @@
 	import { onMount } from 'svelte';
 	import dataset from './dataset.json';
 	import * as d3 from 'd3';
-	import FilterSearch from './FilterSearch.svelte';
-	// import {filteredNeighbourhoods} from './Api.svelte';
 
 	let searchTown;
 	let changeVoorziening;
@@ -11,10 +9,7 @@
 	let maxValue;
 
 	const grey = '#8995A4';
-	const blue = '#00BCC6';
-	const white = '#000000';
-
-	// console.log(filteredNeighbourhoods)
+	const blue = '#00bcc6';
 
 	onMount(async () => {
 		// turn json object to array
@@ -25,14 +20,12 @@
 			item['WijkenEnBuurten'].includes('GM')
 		);
 
-		let objKeysAfstand;
-
 		filteredNeighbourhoods.forEach((item) => {
 			item['Gemeentenaam_1'] = item['Gemeentenaam_1'].trim();
 			item['WijkenEnBuurten'] = item['WijkenEnBuurten'].trim();
 
 			// create array from object with keys that contain the word 'Afstand'
-			objKeysAfstand = Object.keys(item).filter((item) => item.includes('Afstand'));
+			let objKeysAfstand = Object.keys(item).filter((item) => item.includes('Afstand'));
 
 			// turn string to numbers
 			objKeysAfstand.forEach((item2) => (item[item2] = Number(item[item2])));
@@ -45,16 +38,17 @@
 		let arrTownNames = filteredNeighbourhoods.map((item) => item['Gemeentenaam_1']);
 		let searchValue;
 
+		// highlight the town that is being searched
 		const highlightTown = () => {
 			dataBubbles.attr('fill', (d) =>
-					d['Gemeentenaam_1'].includes(searchValue) ? 'red' : '#00BCC6'
+					d['Gemeentenaam_1'].includes(searchValue) ? 'red' : blue
 					
 				);
 		}
 
+		// get the search value and highlight the town
 		searchTown = (e) => {
 			if (e.target.value) {
-				// highlightTown()
 				searchValue = e.target.value[0].toUpperCase() + e.target.value.slice(1);
 				let arrFilteredTownNames = arrTownNames.filter((item) => item.includes(searchValue));
 				listTowns(arrFilteredTownNames);
@@ -64,11 +58,12 @@
 			} else {
 				listTowns(arrTownNames);
 				searchValue = undefined;
-				dataBubbles.attr('fill', '#00BCC6');
+				dataBubbles.attr('fill', blue);
 			}
 
 		};
 
+		// list the town names in the dropdown
 		const listTowns = (townNames) => {
 			d3.select('datalist')
 				.selectAll('option')
@@ -76,30 +71,29 @@
 				.join('option')
 				.text((d) => d)
 				.style('list-style', 'none');
-			// .on('click', d => console.log(d))
 		};
 
 		listTowns(arrTownNames);
 
-
+		// change the voorziening from the dropdown list. Update everything
 		changeVoorziening = (e) => {
 			currentValue = e.target.value;
 			console.log(currentValue);
 			updateAll(currentValue);
 		};
 
-		// on page load
 		console.log(currentValue);
 
+		// get all the values from a voorziening in an array
 		const filterVoorziening = (currentValue) => {
 			let allValues = filteredNeighbourhoods.map((item) => item[currentValue]);
 			return allValues;
 		};
 
+		// find the max value from a list of array
 		const maxValueGrid = (number) => {
 			if (!Array.isArray(number)) {
 				const arr = [];
-				// number = Array.from(String(number), Number);
 				arr.push(number);
 				number = arr;
 			}
@@ -107,12 +101,8 @@
 			return maxValue;
 		};
 
-		// parameter weg? nee
+		// calculate array with object about the grid radius and labels
 		const calculateGrid = (maxValue) => {
-			// const maxValue = d3.max(allValues);
-			// maxValue should be the on click radius value.
-			// scale moet ook veranderen
-			// label moet veranderen
 
 			const math = maxValue / 4;
 
@@ -122,31 +112,14 @@
 				{ radius: 150, circleValues: Math.round((math * 2) * 10) / 10 },
 				{ radius: 75, circleValues: Math.round(math * 10) / 10 }
 			];
-
-			// 	return [
-			// 	{ radius: 100, circleValues: d3.quantile(allValues, 0.1) },
-			// 	{ radius: 200, circleValues: d3.quantile(allValues, 0.4) },
-			// 	{ radius: 300, circleValues: d3.quantile(allValues, 0.6) },
-			// 	{ radius: radius, circleValues: d3.quantile(allValues, 0.9) }
-			// ];
 		};
 
-		// console.log(calculateGrid('AfstandTotBibliotheek_107'))
-
+		// create a linear scale
 		const createScale = (distance) => {
-			// const maxValue = calculateGrid(currentValue)[0]['circleValues'];
-			// console.log(maxValue)
 			const scale = d3.scaleLinear().domain([0, maxValue]).range([0, radius]).clamp(true);
 			return scale(distance);
 		};
 
-		// console.log(createScale())
-
-		// console.log(createScale(1));
-
-		// console.log(calculateGrid('AfstandTotBibliotheek_107'))
-
-		// group all
 		d3.select('#viz #bubbles').attr(
 			'transform',
 			`translate(${radius + marginLeft}, ${radius + marginTop})`
@@ -162,7 +135,7 @@
 
 		d3.selectAll('#groupedGrid').append('text');
 
-		// create radius of each grid circle
+		// create the grid based on caluclateGrid() return value
 		const createGrid = () => {
 			d3.selectAll('#groupedGrid')
 				.data(calculateGrid(maxValue))
@@ -171,18 +144,17 @@
 				.attr('r', (d) => d.radius)
 				.attr('fill', 'transparent')
 				.on('click', (e, d) => {
+					// when clicking on a grid, change that to the maxValue of the grid. Update the visualisation
 					maxValue = maxValueGrid(d.circleValues);
 					createLabelsGrid();
 					createVisualisation(currentValue);
 					highlightTown()
-					console.log(currentValue);
-					// updateAll(currentValue);
-					return console.log(d.circleValues);
 				})
 				.on('mouseover', (e, d) => {
 					d3.select(e.target)
-					.attr('stroke', '#00BCC6')
+					.attr('stroke', blue)
 					.attr('stroke-width', 2)
+					.style('cursor', 'pointer')
 				})
 				.on('mouseout', (e, d) => {
 					d3.select(e.target)
@@ -190,8 +162,7 @@
 				})
 		};
 
-		// add labels for the grids
-
+		// add labels for the grid
 		const createLabelsGrid = () => {
 			d3.selectAll('#groupedGrid text')
 				.data(calculateGrid(maxValue))
@@ -201,27 +172,11 @@
 				.attr('y', (d) => -d.radius - 5)
 				.attr('font-size', '1.1em')
 				.attr('fill', grey)
-				// .on('mouseover', (e, d) => {
-				// 	console.log(e.target)
-				// 	d3.select(e.target)
-				// 	.attr('fill', '#00BCC6')
-				// 	// .attr('stroke-width', 2)
-				// })
-				// .on('mouseout', (e, d) => {
-				// 	d3.select(e.target)
-				// 	.attr('fill', '#8995A4')
-				// })
 		};
 
 		let dataBubbles;
-
-// 		function getTransition() {
-//     return d3.transition()
-//       .duration(1000)
-      
-// }
-
-		// create bubbles for all the data
+		
+		// create circles with the dataset values
 		const createVisualisation = (currentValue) => {
 			dataBubbles = d3
 				.select('#viz')
@@ -257,7 +212,7 @@
 					.style('left', 50 + 'px')
 				})
 				
-				// can only use transition once
+				// add transition to the position of the circles. can only call transition once
 				d3
 				.select('#viz')
 				.select('#viz #bubbles #allDataBubbles')
@@ -275,8 +230,7 @@
 				
 		};
 
-		// createVisualisation(currentValue)
-
+		// update everyting
 		const updateAll = (currentValue) => {
 			maxValueGrid(filterVoorziening(currentValue));
 			calculateGrid(maxValue);
@@ -285,8 +239,6 @@
 			createLabelsGrid();
 			createVisualisation(currentValue)
 			highlightTown();
-
-			// console.log(searchValue)
 		};
 
 		updateAll(currentValue);
@@ -299,18 +251,14 @@
 		<label for="search">Zoeken</label>
 		<div>
 			<input list="towns" id="search" type="text" placeholder="Bijv. Amsterdam" on:input={searchTown} />
-			<!-- <ul /> -->
 			<datalist id="towns">
 				
 			</datalist>
 		</div>
 	</form>
 
-	<!-- <p>hallo hoe gaat het</p> -->
-
 	<form action="">
 		<label for="voorzieningen">Voorziening</label>
-		<!-- <input type="dropdown" placeholder="Gemeente..."> -->
 		<select
 			name="voorzieningen"
 			id="voorzieningen"
@@ -318,19 +266,19 @@
 			on:input={changeVoorziening}
 		>
 
-			<option value="AfstandTotHuisartsenpraktijk_5">AfstandTotHuisartsenpraktijk</option><option
-				value="AfstandTotZiekenhuis_11">AfstandTotZiekenhuis</option
-			><option value="AfstandTotGroteSupermarkt_24">AfstandTotGroteSupermarkt</option><option
-				value="AfstandTotCafeED_36">AfstandTotCafeED</option
-			><option value="AfstandTotRestaurant_44">AfstandTotRestaurant</option><option
-				value="AfstandTotHotelED_48">AfstandTotHotelED</option
-			><option value="AfstandTotKinderdagverblijf_52">AfstandTotKinderdagverblijf</option><option
-				value="AfstandTotBuitenschoolseOpvang_56">AfstandTotBuitenschoolseOpvang</option
-			><option value="AfstandTotSchool_60">AfstandTotBasisonderwijs</option><option
-				value="AfstandTotSchool_64">AfstandTotVoortgezetOnderwijs</option
-			><option value="AfstandTotBibliotheek_107">AfstandTotBibliotheek</option><option
-				value="AfstandTotMuseum_110">AfstandTotMuseum</option
-			><option value="AfstandTotBioscoop_119">AfstandTotBioscoop</option>
+			<option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option><option
+				value="AfstandTotZiekenhuis_11">Ziekenhuis</option
+			><option value="AfstandTotGroteSupermarkt_24">GroteSupermarkt</option><option
+				value="AfstandTotCafeED_36">Cafe (e.d)</option
+			><option value="AfstandTotRestaurant_44">Restaurant</option><option
+				value="AfstandTotHotelED_48">Hotel (e.d)</option
+			><option value="AfstandTotKinderdagverblijf_52">Kinderdagverblijf</option><option
+				value="AfstandTotBuitenschoolseOpvang_56">BuitenschoolseOpvang</option
+			><option value="AfstandTotSchool_60">Basisonderwijs</option><option
+				value="AfstandTotSchool_64">VoortgezetOnderwijs</option
+			><option value="AfstandTotBibliotheek_92">Bibliotheek</option><option
+				value="AfstandTotMuseum_95">Museum</option
+			><option value="AfstandTotBioscoop_104">Bioscoop</option>
 		</select>
 	</form>
 </div>
@@ -348,15 +296,9 @@
 </section>
 
 <style>
-	/* section form:nth-child(1):focus ul {
-		style="
---blue= '#00BCC6';
---white= '#000000';
---grey= '#8995A4';"
-h1 = 
-h2 = 
-p = 
-	} */
+	:root {
+		--blue: #00bcc6;
+	}
 
 	section {
 		display: flex;
@@ -382,41 +324,28 @@ p =
 	}
 
 	input, select {
-		border: #00BCC6 solid;
-		caret-color: #00BCC6;
-		/* border-radius: 1rem; */
+		border: var(--blue) solid;
+		caret-color: var(--blue);
 		height: 2.8rem;
 		width: 17rem;
 		background-color: transparent;
 		padding-left: 1.5rem;
 		outline: none;
-		/* color: #00BCC6; */
 	}
 
 	input, input::placeholder, select {
-		color: #00BCC6;
+		color: var(--blue);
 		font-size: 1rem;
 	}
 
-	select, input {
-		
-	}
-
 	input::placeholder {
-		/* opacity: 0.5; */
 		color: #8995A4;
 	}
-
-
-
-	/* svg {
-		border: solid black;
-	} */
 
 	#tooltip {
 		position: absolute;
 		padding: 0.5rem;
-		border: solid #00BCC6;
+		border: solid var(--blue);
 		background: hsla(226, 22%, 16%, 0.7);
 		width: 11.7rem;
 		height: 7.3rem;
@@ -433,14 +362,3 @@ p =
 		font-size: 1.125rem;
 	}
 </style>
-
-
-<!-- p = 18px = 1.125rem -->
-<!-- h1 = 40px = 2.5rem -->
-<!-- h2 = 32px = 2rem -->
-<!-- h3 = 27.2px = 1.7 -->
-
-<!-- p = 16px = 1rem -->
-<!-- h1 = 40px = 2.5rem -->
-<!-- h2 = 32px = 2rem -->
-<!-- h3 = 27.2px = 1.7 -->
