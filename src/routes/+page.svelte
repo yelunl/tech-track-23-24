@@ -1,4 +1,3 @@
-<!-- <script src="d3.js"></script> -->
 <script>
 	import Circle from "../components/Circle.svelte";
     import Intro from "../components/Intro.svelte";
