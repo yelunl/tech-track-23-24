@@ -73,11 +73,8 @@
 		// change the voorziening from the dropdown list. Update everything
 		changeVoorziening = (e) => {
 			currentValue = e.target.value;
-			console.log(currentValue);
 			updateAll(currentValue);
 		};
-
-		console.log(currentValue);
 
 		// get all the values from a voorziening in an array
 		const filterVoorziening = (currentValue) => {
