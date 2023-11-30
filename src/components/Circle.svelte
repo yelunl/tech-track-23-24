@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import dataset from './dataset.json';
+	import dataset from '../dataset.json';
 	import * as d3 from 'd3';
 
 	let searchTown;
