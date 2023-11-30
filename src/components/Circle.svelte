@@ -163,7 +163,7 @@
 		d3.selectAll('#groupedGrid').append('text');
 
 		// create radius of each grid circle
-		const radiusGrid = () => {
+		const createGrid = () => {
 			d3.selectAll('#groupedGrid')
 				.data(calculateGrid(maxValue))
 				.append('circle')
@@ -171,11 +171,8 @@
 				.attr('r', (d) => d.radius)
 				.attr('fill', 'transparent')
 				.on('click', (e, d) => {
-					// maxValue = d.circleValues
 					maxValue = maxValueGrid(d.circleValues);
-					console.log(maxValue);
-					createLabelsGrid(currentValue);
-					// createScale(1);
+					createLabelsGrid();
 					createVisualisation(currentValue);
 					highlightTown()
 					console.log(currentValue);
@@ -195,7 +192,7 @@
 
 		// add labels for the grids
 
-		const createLabelsGrid = (currentValue) => {
+		const createLabelsGrid = () => {
 			d3.selectAll('#groupedGrid text')
 				.data(calculateGrid(maxValue))
 				.text((d) => d.circleValues + ' km')
@@ -283,9 +280,9 @@
 		const updateAll = (currentValue) => {
 			maxValueGrid(filterVoorziening(currentValue));
 			calculateGrid(maxValue);
-			radiusGrid();
+			createGrid();
 			createScale(1);
-			createLabelsGrid(currentValue);
+			createLabelsGrid();
 			createVisualisation(currentValue)
 			highlightTown();
 
@@ -388,8 +385,8 @@ p =
 		border: #00BCC6 solid;
 		caret-color: #00BCC6;
 		/* border-radius: 1rem; */
-		height: 3rem;
-		width: 19rem;
+		height: 2.8rem;
+		width: 17rem;
 		background-color: transparent;
 		padding-left: 1.5rem;
 		outline: none;
@@ -421,8 +418,8 @@ p =
 		padding: 0.5rem;
 		border: solid #00BCC6;
 		background: hsla(226, 22%, 16%, 0.7);
-		width: 15.7rem;
-		height: 10.3rem;
+		width: 11.7rem;
+		height: 7.3rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
