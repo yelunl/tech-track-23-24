@@ -40,11 +40,8 @@
 
 		// highlight the town that is being searched
 		const highlightTown = () => {
-			dataBubbles.attr('fill', (d) =>
-					d['Gemeentenaam_1'].includes(searchValue) ? 'red' : blue
-					
-				);
-		}
+			dataBubbles.attr('fill', (d) => (d['Gemeentenaam_1'].includes(searchValue) ? 'red' : blue));
+		};
 
 		// get the search value and highlight the town
 		searchTown = (e) => {
@@ -54,13 +51,11 @@
 				listTowns(arrFilteredTownNames);
 
 				highlightTown();
-				
 			} else {
 				listTowns(arrTownNames);
 				searchValue = undefined;
 				dataBubbles.attr('fill', blue);
 			}
-
 		};
 
 		// list the town names in the dropdown
@@ -103,13 +98,12 @@
 
 		// calculate array with object about the grid radius and labels
 		const calculateGrid = (maxValue) => {
-
 			const math = maxValue / 4;
 
 			return [
-				{ radius: radius, circleValues: Math.round((math * 4) * 10) / 10 },
-				{ radius: 225, circleValues: Math.round((math * 3) * 10) / 10 },
-				{ radius: 150, circleValues: Math.round((math * 2) * 10) / 10 },
+				{ radius: radius, circleValues: Math.round(math * 4 * 10) / 10 },
+				{ radius: 225, circleValues: Math.round(math * 3 * 10) / 10 },
+				{ radius: 150, circleValues: Math.round(math * 2 * 10) / 10 },
 				{ radius: 75, circleValues: Math.round(math * 10) / 10 }
 			];
 		};
@@ -148,18 +142,17 @@
 					maxValue = maxValueGrid(d.circleValues);
 					createLabelsGrid();
 					createVisualisation(currentValue);
-					highlightTown()
+					highlightTown();
 				})
 				.on('mouseover', (e, d) => {
 					d3.select(e.target)
-					.attr('stroke', blue)
-					.attr('stroke-width', 2)
-					.style('cursor', 'pointer')
+						.attr('stroke', blue)
+						.attr('stroke-width', 2)
+						.style('cursor', 'pointer');
 				})
 				.on('mouseout', (e, d) => {
-					d3.select(e.target)
-					.attr('stroke', '#8995A4')
-				})
+					d3.select(e.target).attr('stroke', '#8995A4');
+				});
 		};
 
 		// add labels for the grid
@@ -171,11 +164,11 @@
 				// .attr('y', grid.map(item => item.radius))
 				.attr('y', (d) => -d.radius - 5)
 				.attr('font-size', '1.1em')
-				.attr('fill', grey)
+				.attr('fill', grey);
 		};
 
 		let dataBubbles;
-		
+
 		// create circles with the dataset values
 		const createVisualisation = (currentValue) => {
 			dataBubbles = d3
@@ -187,18 +180,9 @@
 				.attr('r', 4)
 				.attr('fill', blue)
 				.on('mouseover', (e, d) => {
-					d3.select('#tooltip')
-						.style('opacity', 1)
-						.select('h3')
-						.text(
-							`${d['Gemeentenaam_1']}`
-						)
+					d3.select('#tooltip').style('opacity', 1).select('h3').text(`${d['Gemeentenaam_1']}`);
 
-						d3.select('#tooltip p')
-						.text(
-							`Afstand: ${d[currentValue]} km`
-						)
-
+					d3.select('#tooltip p').text(`Afstand: ${d[currentValue]} km`);
 				})
 				.on('mousemove', (e, d) => {
 					d3.select('#tooltip')
@@ -208,13 +192,12 @@
 				})
 				.on('mouseout', (e, d) => {
 					d3.select('#tooltip')
-					.style('opacity', 0)
-					.style('left', 50 + 'px')
-				})
-				
-				// add transition to the position of the circles. can only call transition once
-				d3
-				.select('#viz')
+						.style('opacity', 0)
+						.style('left', 50 + 'px');
+				});
+
+			// add transition to the position of the circles. can only call transition once
+			d3.select('#viz')
 				.select('#viz #bubbles #allDataBubbles')
 				.selectAll('circle')
 				.transition()
@@ -226,8 +209,7 @@
 				.attr('cy', function (d, i) {
 					const alpha = ((2 * Math.PI) / filteredNeighbourhoods.length) * i;
 					return createScale(d[currentValue]) * Math.sin(alpha - Math.PI / 2);
-				})
-				
+				});
 		};
 
 		// update everyting
@@ -237,7 +219,7 @@
 			createGrid();
 			createScale(1);
 			createLabelsGrid();
-			createVisualisation(currentValue)
+			createVisualisation(currentValue);
 			highlightTown();
 		};
 
@@ -247,41 +229,44 @@
 
 <section>
 	<div>
-	<form action="">
-		<label for="search">Zoeken</label>
-		<div>
-			<input list="towns" id="search" type="text" placeholder="Bijv. Amsterdam" on:input={searchTown} />
-			<datalist id="towns">
-				
-			</datalist>
-		</div>
-	</form>
+		<form action="">
+			<label for="search">Zoeken</label>
+			<div>
+				<input
+					list="towns"
+					id="search"
+					type="text"
+					placeholder="Bijv. Amsterdam"
+					on:input={searchTown}
+				/>
+				<datalist id="towns" />
+			</div>
+		</form>
 
-	<form action="">
-		<label for="voorzieningen">Voorziening</label>
-		<select
-			name="voorzieningen"
-			id="voorzieningen"
-			bind:value={currentValue}
-			on:input={changeVoorziening}
-		>
-
-			<option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option><option
-				value="AfstandTotZiekenhuis_11">Ziekenhuis</option
-			><option value="AfstandTotGroteSupermarkt_24">GroteSupermarkt</option><option
-				value="AfstandTotCafeED_36">Cafe (e.d)</option
-			><option value="AfstandTotRestaurant_44">Restaurant</option><option
-				value="AfstandTotHotelED_48">Hotel (e.d)</option
-			><option value="AfstandTotKinderdagverblijf_52">Kinderdagverblijf</option><option
-				value="AfstandTotBuitenschoolseOpvang_56">BuitenschoolseOpvang</option
-			><option value="AfstandTotSchool_60">Basisonderwijs</option><option
-				value="AfstandTotSchool_64">VoortgezetOnderwijs</option
-			><option value="AfstandTotBibliotheek_92">Bibliotheek</option><option
-				value="AfstandTotMuseum_95">Museum</option
-			><option value="AfstandTotBioscoop_104">Bioscoop</option>
-		</select>
-	</form>
-</div>
+		<form action="">
+			<label for="voorzieningen">Voorziening</label>
+			<select
+				name="voorzieningen"
+				id="voorzieningen"
+				bind:value={currentValue}
+				on:input={changeVoorziening}
+			>
+				<option value="AfstandTotHuisartsenpraktijk_5">Huisartsenpraktijk</option><option
+					value="AfstandTotZiekenhuis_11">Ziekenhuis</option
+				><option value="AfstandTotGroteSupermarkt_24">GroteSupermarkt</option><option
+					value="AfstandTotCafeED_36">Cafe (e.d)</option
+				><option value="AfstandTotRestaurant_44">Restaurant</option><option
+					value="AfstandTotHotelED_48">Hotel (e.d)</option
+				><option value="AfstandTotKinderdagverblijf_52">Kinderdagverblijf</option><option
+					value="AfstandTotBuitenschoolseOpvang_56">BuitenschoolseOpvang</option
+				><option value="AfstandTotSchool_60">Basisonderwijs</option><option
+					value="AfstandTotSchool_64">VoortgezetOnderwijs</option
+				><option value="AfstandTotBibliotheek_92">Bibliotheek</option><option
+					value="AfstandTotMuseum_95">Museum</option
+				><option value="AfstandTotBioscoop_104">Bioscoop</option>
+			</select>
+		</form>
+	</div>
 
 	<svg id="viz" width="1150" height="750">
 		<g id="bubbles">
@@ -289,9 +274,9 @@
 			<g id="allDataBubbles" />
 		</g>
 	</svg>
-	<div id="tooltip" >
-		<h3></h3>
-		<p></p>
+	<div id="tooltip">
+		<h3 />
+		<p />
 	</div>
 </section>
 
@@ -303,13 +288,15 @@
 	section {
 		display: flex;
 		justify-content: space-between;
-
 	}
 
-	p, label, h3 {
+	p,
+	label,
+	h3 {
 		color: white;
 		font-size: 1rem; /* 18px */
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+			Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	}
 
 	label {
@@ -323,7 +310,8 @@
 		margin: 2rem;
 	}
 
-	input, select {
+	input,
+	select {
 		border: var(--blue) solid;
 		caret-color: var(--blue);
 		height: 2.8rem;
@@ -333,13 +321,15 @@
 		outline: none;
 	}
 
-	input, input::placeholder, select {
+	input,
+	input::placeholder,
+	select {
 		color: var(--blue);
 		font-size: 1rem;
 	}
 
 	input::placeholder {
-		color: #8995A4;
+		color: #8995a4;
 	}
 
 	#tooltip {
